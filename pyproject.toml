@@ -1,0 +1,20 @@
+[project]
+name = "buonacaccia"
+version = "0.1.0"
+description = "Elenco eventi Formazione Capi (Veneto e Nazionale) da BuonaCaccia"
+readme = "README.md"
+authors = [
+    { name = "Mario De Menech", email = "mario.demenech@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+buonacaccia = "buonacaccia:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
