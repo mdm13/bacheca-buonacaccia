@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T10:10:00+01:00",
+  "title": "Design System: Bacheca eventi BuonaCaccia",
+  "extensions": {
+    "colorMeta": {
+      "cork": { "role": "primary", "displayName": "Speckled Cork", "canonical": "oklch(46.3% 0.068 62.4)", "dark": "#3a281a", "tonalRamp": ["#1a0400", "#3a1b00", "#593715", "#795534", "#9b7453", "#bd9573", "#e5bb97", "#ffe6c5"] },
+      "cork-dot-a": { "role": "primary", "displayName": "Cork Speckle Dark", "dark": "#2f2014" },
+      "cork-dot-b": { "role": "primary", "displayName": "Cork Speckle Light", "dark": "#46311f" },
+      "cork-deep": { "role": "primary", "displayName": "Deep Cork", "canonical": "oklch(39.7% 0.059 60.9)", "dark": "#2c1e13", "tonalRamp": ["#1c0300", "#381c01", "#56381d", "#76563a", "#987559", "#ba9679", "#e1bc9e", "#ffe7cb"] },
+      "on-cork": { "role": "primary", "displayName": "Cream on Cork", "dark": "#f6eee4" },
+      "on-cork-soft": { "role": "primary", "displayName": "Soft Cream on Cork", "dark": "#dccbb8" },
+      "note-paper": { "role": "neutral", "displayName": "Note Paper", "canonical": "oklch(99.4% 0.007 88.6)", "dark": "#fffdf8", "tonalRamp": ["#0c0b08", "#252420", "#41403c", "#5f5d59", "#7f7d79", "#a09e9a", "#c6c4bf", "#f0eee9"] },
+      "note-paper-hover": { "role": "neutral", "displayName": "Note Paper Hover", "dark": "#f1e9de" },
+      "ground": { "role": "neutral", "displayName": "Hall Floor", "canonical": "oklch(94.0% 0.005 95.1)", "dark": "#171411", "tonalRamp": ["#0c0b09", "#252421", "#40403d", "#5e5e5a", "#7e7d7a", "#9f9e9b", "#c5c4c0", "#efeeea"] },
+      "paper": { "role": "neutral", "displayName": "Flyer Paper", "canonical": "oklch(100% 0 0)", "dark": "#24201c", "tonalRamp": ["#0b0b0b", "#242424", "#404040", "#5d5d5d", "#7d7d7d", "#9e9e9e", "#c4c4c4", "#eeeeee"] },
+      "paper-edge": { "role": "neutral", "displayName": "Paper Edge", "canonical": "oklch(87.9% 0.017 79.3)", "dark": "#3a332c", "tonalRamp": ["#0f0a04", "#28231b", "#453f36", "#635d53", "#837c72", "#a49d93", "#cac3b8", "#f5ede2"] },
+      "ink": { "role": "neutral", "displayName": "Brown-Black Ink", "canonical": "oklch(25.6% 0.019 59.7)", "dark": "#f1ebe3", "tonalRamp": ["#110904", "#2b221b", "#473e36", "#665b53", "#867b72", "#a89c93", "#cec2b8", "#f9ece2"] },
+      "ink-soft": { "role": "neutral", "displayName": "Faded Ink", "canonical": "oklch(44.2% 0.027 62.7)", "dark": "#c2b5a6", "tonalRamp": ["#130802", "#2d2116", "#4a3d31", "#695b4e", "#897a6d", "#ab9b8e", "#d1c1b3", "#fcebdd"] },
+      "track": { "role": "neutral", "displayName": "Track", "canonical": "oklch(92.4% 0.018 81.3)", "dark": "#3a332c", "tonalRamp": ["#0f0a04", "#28231a", "#453f35", "#635d53", "#837c72", "#a49e92", "#cac3b8", "#f5eee1"] },
+      "focus": { "role": "neutral", "displayName": "Focus Blue", "canonical": "oklch(48.5% 0.133 254.6)", "dark": "#9ec3ff", "tonalRamp": ["#00003b", "#001d61", "#003d83", "#1d5da6", "#407fca", "#61a1ef", "#99c8ff", "#def0ff"] },
+      "pin-fc": { "role": "secondary", "displayName": "Formazione Capi Blue", "canonical": "oklch(48.5% 0.133 254.6)", "tonalRamp": ["#00003b", "#001d61", "#003d83", "#1d5da6", "#407fca", "#61a1ef", "#99c8ff", "#def0ff"] },
+      "pin-lc": { "role": "secondary", "displayName": "L/C Yellow", "canonical": "oklch(81.1% 0.166 85.0)", "tonalRamp": ["#120900", "#322100", "#533b00", "#795700", "#9e7601", "#c99500", "#f5ba11", "#ffe557"] },
+      "pin-eg": { "role": "secondary", "displayName": "E/G Green", "canonical": "oklch(52.3% 0.135 144.2)", "tonalRamp": ["#001100", "#002f00", "#005000", "#1f7025", "#439146", "#66b467", "#8cdb8b", "#bcffbb"] },
+      "pin-rs": { "role": "secondary", "displayName": "R/S Red", "canonical": "oklch(53.9% 0.194 26.7)", "tonalRamp": ["#200000", "#4e0000", "#7f0005", "#b10414", "#d83c38", "#ff6359", "#ffa79c", "#ffe6e2"] },
+      "pin-aa": { "role": "secondary", "displayName": "Speciale Grey", "canonical": "oklch(52.6% 0.007 75.4)", "tonalRamp": ["#0d0b08", "#262420", "#423f3c", "#605d59", "#807d79", "#a19e99", "#c7c3bf", "#f1eee9"] },
+      "stamp-soon": { "role": "tertiary", "displayName": "Indigo Stamp", "canonical": "oklch(42.5% 0.172 280.6)", "dark": "#aab0ff", "tonalRamp": ["#0a0034", "#210073", "#362696", "#5149ba", "#6e6be0", "#8d8eff", "#b8bdff", "#e9ecff"] },
+      "stamp-open": { "role": "tertiary", "displayName": "Green Stamp", "canonical": "oklch(47.2% 0.112 143.8)", "dark": "#8fd18f", "tonalRamp": ["#001100", "#002e00", "#0b4e11", "#306d31", "#518e51", "#72b171", "#97d796", "#c1ffbf"] },
+      "stamp-full": { "role": "tertiary", "displayName": "Red Stamp", "canonical": "oklch(50.1% 0.178 28.7)", "dark": "#ff8f85", "tonalRamp": ["#210000", "#4e0000", "#800000", "#ac1d17", "#d2463a", "#f96a5b", "#ffa699", "#ffe6e1"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Board name in the cork header only; 2rem from 960px." },
+      "headline": { "displayName": "Headline", "purpose": "Flyer date line, the largest element on each flyer." },
+      "title": { "displayName": "Title", "purpose": "Event name linked to BuonaCaccia; balanced wrap." },
+      "body": { "displayName": "Body", "purpose": "Base text, tabular numerals throughout." },
+      "body-small": { "displayName": "Body Small", "purpose": "Place/date lines and results meta." },
+      "label": { "displayName": "Label", "purpose": "Chips, notes, buttons (0.875 to 0.95rem)." },
+      "stamp": { "displayName": "Stamp", "purpose": "Uppercase state words DA APRIRE, APERTE, PIENO." },
+      "group-label": { "displayName": "Group Label", "purpose": "Uppercase fieldset legends inside the cork filter panel." }
+    },
+    "textures": [
+      { "name": "cork", "value": "background-color: var(--cork); background-image: radial-gradient(var(--cork-dot-a) 1px, transparent 1.4px), radial-gradient(var(--cork-dot-b) 1px, transparent 1.4px); background-size: 7px 7px, 11px 11px; background-position: 0 0, 3px 5px;", "purpose": "Shell, mobile filter panel, desktop filter column." }
+    ],
+    "shadows": [
+      { "name": "paper", "value": "0 1px 2px rgb(42 33 26 / .12), 0 3px 10px rgb(42 33 26 / .07)", "dark": "0 1px 2px rgb(0 0 0 / .4), 0 4px 14px rgb(0 0 0 / .25)", "purpose": "Flyers and cork panels." },
+      { "name": "note", "value": "0 2px 3px rgb(0 0 0 / .25)", "purpose": "Favourite notes and note editor on cork." },
+      { "name": "note-hover", "value": "0 4px 8px rgb(0 0 0 / .28)", "purpose": "Hovered note." },
+      { "name": "pin", "value": "0 1.5px 1.5px rgb(0 0 0 / .35)", "purpose": "Pushpin heads; flyer pins add inset -2px -2px 0 rgb(0 0 0 / .15)." },
+      { "name": "inset-field", "value": "inset 0 1px 2px rgb(0 0 0 / .12)", "purpose": "Search field pressed into cork." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Shared easing for all motion." },
+      { "name": "control-color", "value": ".15s", "purpose": "Button and chip colour changes." },
+      { "name": "note-lift", "value": ".2s", "purpose": "Note straighten and lift on hover." },
+      { "name": "pin-push", "value": ".38s", "purpose": "Pin squash and note settle when a favourite is applied." },
+      { "name": "panel-drop", "value": ".22s", "purpose": "Mobile filter panel opening, from -6px." },
+      { "name": "board-reorder", "value": ".18s", "purpose": "View transition when results re-render." },
+      { "name": "reduced-motion", "value": "none", "purpose": "All animation and transition removed under prefers-reduced-motion." }
+    ],
+    "tilts": [
+      { "name": "flyer", "value": "-0.35deg / 0.3deg / 0deg, cycling every 3", "purpose": "Hand-hung flyers." },
+      { "name": "note", "value": "-2deg, 1.5deg, -1deg, 2deg, -1.5deg cycling", "purpose": "Favourite notes on cork." },
+      { "name": "stamp", "value": "-2deg from left center", "purpose": "Rubber stamps." }
+    ],
+    "breakpoints": [
+      { "name": "desktop", "value": "960px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Flyer",
+      "kind": "card",
+      "refersTo": "flyer",
+      "description": "One event: pinned white paper with date headline, stamp, title, place and facts row.",
+      "html": "<article class=\"ds-flyer\" style=\"--p: var(--pin-eg, #2e7d32)\"><div class=\"ds-when\"><p class=\"ds-date\">Apre sab 31 ott</p><span class=\"ds-count\">tra 4 giorni</span></div><span class=\"ds-stamp ds-stamp-soon\">DA APRIRE</span><h3 class=\"ds-title\"><a href=\"#\">Capi Squadriglia - Centro</a></h3><p class=\"ds-where\">Lazio · Bracciano (RM) · 5-7 dic · 31,00 €</p><div class=\"ds-facts\"><div class=\"ds-dur\"><div class=\"ds-bar\"><i style=\"width:38%\"></i></div><span class=\"ds-dur-label\">3 giorni</span></div><span><b>15</b> posti liberi su 15</span></div></article>",
+      "css": ".ds-flyer { position: relative; max-width: 360px; background: var(--paper, #fff); color: var(--ink, #2a211a); border: 1px solid var(--paper-edge, #ddd6cb); border-radius: 4px; padding: 14px 16px 12px; box-shadow: 0 1px 2px rgb(42 33 26 / .12), 0 3px 10px rgb(42 33 26 / .07); transform: rotate(-.35deg); font-family: Barlow, system-ui, sans-serif; font-variant-numeric: tabular-nums; line-height: 1.45; } .ds-flyer::before { content: \"\"; position: absolute; top: -7px; left: 20px; width: 14px; height: 14px; border-radius: 50%; background: var(--p); box-shadow: 0 1.5px 1.5px rgb(0 0 0 / .35), inset -2px -2px 0 rgb(0 0 0 / .15); } .ds-when { display: flex; justify-content: space-between; align-items: baseline; gap: 2px 12px; } .ds-date { margin: 0; font-family: 'Barlow Condensed', Barlow, sans-serif; font-weight: 700; font-size: 1.85rem; line-height: 1; } .ds-count { font-size: .85rem; font-weight: 600; color: var(--ink-soft, #5e5044); } .ds-stamp { display: inline-block; margin-top: 8px; padding: 1px 8px; border: 2px solid currentColor; border-radius: 2px; font-family: 'Barlow Condensed', Barlow, sans-serif; font-weight: 700; font-size: .9rem; letter-spacing: .09em; transform: rotate(-2deg); transform-origin: left center; } .ds-stamp-soon { color: var(--stamp-soon, #4338a8); } .ds-title { margin: 8px 0 0; font-size: 1.1rem; font-weight: 600; line-height: 1.25; } .ds-title a { color: inherit; text-decoration: none; } .ds-title a:hover { text-decoration: underline; } .ds-title a:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-where { margin: 4px 0 0; font-size: .9rem; color: var(--ink-soft, #5e5044); } .ds-facts { display: flex; align-items: center; gap: 14px; margin-top: 10px; font-size: .875rem; } .ds-dur { flex: 1; display: grid; gap: 4px; } .ds-bar { height: 6px; border-radius: 3px; background: var(--track, #ece5d9); position: relative; overflow: hidden; } .ds-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--ink, #2a211a); } .ds-dur-label { font-size: .78rem; color: var(--ink-soft, #5e5044); } .ds-facts b { font-size: 1.05rem; }"
+    },
+    {
+      "name": "Stamps",
+      "kind": "custom",
+      "refersTo": "stamp-full",
+      "description": "Registration state as a tilted rubber stamp; PIENO uses a double border.",
+      "html": "<div class=\"ds-stamps\"><span class=\"ds-st\" style=\"color: var(--stamp-soon, #4338a8)\">DA APRIRE</span><span class=\"ds-st\" style=\"color: var(--stamp-open, #2e6b2f)\">APERTE</span><span class=\"ds-st ds-st-full\">PIENO</span></div>",
+      "css": ".ds-stamps { display: flex; gap: 16px; padding: 12px; background: var(--paper, #fff); } .ds-st { display: inline-block; padding: 1px 8px; border: 2px solid currentColor; border-radius: 2px; font-family: 'Barlow Condensed', Barlow, sans-serif; font-weight: 700; font-size: .9rem; letter-spacing: .09em; transform: rotate(-2deg); transform-origin: left center; } .ds-st-full { color: var(--stamp-full, #b3261e); border-style: double; border-width: 3px; }"
+    },
+    {
+      "name": "Favourite Notes on Cork",
+      "kind": "custom",
+      "refersTo": "note",
+      "description": "Pinned favourite-filter slips in the cork header, plus the dashed Appunta note.",
+      "html": "<div class=\"ds-cork\"><button class=\"ds-note\" style=\"--tilt:-2deg; --p: var(--pin-fc, #1f5fa8)\" aria-pressed=\"true\">CFM L/C Veneto</button><button class=\"ds-note\" style=\"--tilt:1.5deg; --p: var(--pin-rs, #c62828)\">ROSS Lazio</button><button class=\"ds-note ds-note-add\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>Appunta</button></div>",
+      "css": ".ds-cork { display: flex; gap: 10px; padding: 18px 16px 14px; background-color: var(--cork, #74502f); background-image: radial-gradient(var(--cork-dot-a, #664527) 1px, transparent 1.4px), radial-gradient(var(--cork-dot-b, #82593a) 1px, transparent 1.4px); background-size: 7px 7px, 11px 11px; background-position: 0 0, 3px 5px; } .ds-note { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 9px 13px 8px; font: 600 .9rem/1.1 Barlow, system-ui, sans-serif; color: #2a211a; background: #fffdf8; border: 0; border-radius: 2px; cursor: pointer; box-shadow: 0 2px 3px rgb(0 0 0 / .25); transform: rotate(var(--tilt, 0deg)); transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s cubic-bezier(.16,1,.3,1); } .ds-note::before { content: \"\"; position: absolute; top: -6px; left: 50%; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: var(--p); box-shadow: 0 1.5px 1.5px rgb(0 0 0 / .35); } .ds-note:hover { transform: rotate(0deg) translateY(-1px); box-shadow: 0 4px 8px rgb(0 0 0 / .28); } .ds-note:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-note[aria-pressed=\"true\"] { outline: 2.5px solid #2a211a; outline-offset: -2.5px; transform: rotate(0deg); } .ds-note-add { background: transparent; color: var(--on-cork, #fffdf8); box-shadow: none; border: 1.5px dashed var(--on-cork-soft, #f1e4d3); } .ds-note-add::before { display: none; } .ds-note-add:hover { background: rgb(255 255 255 / .08); box-shadow: none; }"
+    },
+    {
+      "name": "Filter Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill filters; branch chips carry their pin dot; pressed fills ink.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\"><span class=\"ds-dot\" style=\"--p: var(--pin-lc, #f2b705)\"></span>L/C</button><button class=\"ds-chip\" aria-pressed=\"false\"><span class=\"ds-dot\" style=\"--p: var(--pin-eg, #2e7d32)\"></span>E/G</button><button class=\"ds-chip\" aria-pressed=\"false\">Tutte le regioni</button></div>",
+      "css": ".ds-chips { display: flex; gap: 7px; flex-wrap: wrap; } .ds-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 6px 13px; border-radius: 999px; border: 1.5px solid var(--ink, #2a211a); background: var(--paper, #fff); color: var(--ink, #2a211a); font: 600 .875rem Barlow, system-ui, sans-serif; cursor: pointer; transition: background-color .15s, color .15s; } .ds-chip:hover { background: var(--track, #ece5d9); } .ds-chip:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-chip[aria-pressed=\"true\"] { background: var(--ink, #2a211a); color: var(--paper, #fff); } .ds-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--p); box-shadow: 0 0 0 1.5px var(--paper, #fff); }"
+    },
+    {
+      "name": "Ink Button",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "Primary action on paper (e.g. show full events).",
+      "html": "<button class=\"ds-btn ds-btn-ink\">Mostra gli eventi pieni</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 8px 14px; border-radius: 4px; font: 600 .95rem Barlow, system-ui, sans-serif; cursor: pointer; border: 1.5px solid transparent; transition: background-color .15s, border-color .15s, color .15s; } .ds-btn:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-btn-ink { background: var(--ink, #2a211a); color: var(--paper, #fff); } .ds-btn-ink:hover { background: var(--ink-soft, #5e5044); }"
+    },
+    {
+      "name": "Paper Button",
+      "kind": "button",
+      "refersTo": "button-paper",
+      "description": "Primary action on cork; the ink button takes this look inside the cork panel.",
+      "html": "<div class=\"ds-on-cork\"><button class=\"ds-btn ds-btn-paper\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14v7\"/></svg>Appunta questo filtro</button></div>",
+      "css": ".ds-on-cork { padding: 16px; background: var(--cork, #74502f); } .ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 8px 14px; border-radius: 4px; font: 600 .95rem Barlow, system-ui, sans-serif; cursor: pointer; border: 1.5px solid transparent; transition: background-color .15s; } .ds-btn:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-btn-paper { background: #fffdf8; color: #2a211a; } .ds-btn-paper:hover { background: #f1e9de; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action; currentColor outline, cream on cork, ink on paper.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">Azzera filtri</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; min-height: 42px; padding: 8px 14px; border-radius: 4px; font: 600 .95rem Barlow, system-ui, sans-serif; cursor: pointer; border: 1.5px solid transparent; transition: background-color .15s; } .ds-btn:focus-visible { outline: 2px solid var(--focus, #1f5fa8); outline-offset: 2px; } .ds-btn-ghost { background: transparent; color: var(--ink, #2a211a); border-color: currentColor; } .ds-btn-ghost:hover { background: rgb(127 127 127 / .12); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search",
+      "description": "Cream search bar pressed into the cork header.",
+      "html": "<div class=\"ds-on-cork\"><label class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"m16 16 4.5 4.5\"/></svg><input type=\"search\" placeholder=\"Cerca evento, luogo, tipologia…\"></label></div>",
+      "css": ".ds-on-cork { padding: 16px; background: var(--cork, #74502f); } .ds-search { display: flex; align-items: center; gap: 10px; background: #fffdf8; color: #5e5044; border-radius: 6px; padding: 0 12px; box-shadow: inset 0 1px 2px rgb(0 0 0 / .12); } .ds-search input { flex: 1; min-width: 0; min-height: 46px; border: 0; background: transparent; font: 500 1rem Barlow, system-ui, sans-serif; color: #2a211a; outline: none; } .ds-search input::placeholder { color: #6b5d50; } .ds-search:focus-within { outline: 2px solid var(--on-cork, #fffdf8); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La bacheca di sede",
+    "overview": "The page is the cork noticeboard in a scout troop hall. A dark, finely speckled cork shell holds everything a leader handles (the board name, their pinned favourite searches, the search field, the filter panel); white paper flyers hang below it, one per event, each held by a coloured pushpin that says which branch it belongs to. The registration-opening date is the flyer's headline, set big in a condensed face, and the registration state is a rubber stamp with a word on it.\n\nDensity is phone-first and practical: one column of flyers at 390px, a sticky cork filter column plus a two-column flyer grid from 960px. The physical metaphor is carried by a small set of real devices (cork texture, pins, slight hand-hung tilt, stamps, soft paper shadows), never by illustration or skeuomorphic chrome. Everything else is plain, legible Barlow on paper.\n\nThe dark theme is the same board at night: burnt cork and warm grey paper, with the cream notes and fields on the cork kept cream so they still read as paper pinned to it.",
+    "keyCharacteristics": [
+      "Two materials: cork for controls, paper for content.",
+      "Pin colour is the branch legend, shared by flyer pins, chip dots and favourite notes.",
+      "State shown as a tilted stamp with a word, never by colour alone.",
+      "Condensed display type reserved for dates, the board name and stamps.",
+      "Small, deliberate tilts that straighten on interaction.",
+      "Flat paper with soft, low shadows; no heavy elevation."
+    ],
+    "rules": [
+      { "name": "The Two Materials Rule", "body": "Cork carries controls; paper carries events. Content never sits on cork, and filters never sit on white paper.", "section": "colors" },
+      { "name": "The Pin Is the Legend Rule", "body": "A pin colour is used only to identify a branch, and only as a pin or dot next to the branch name or on a flyer that names its branch. Never use pin colours for buttons, links, highlights or decoration.", "section": "colors" },
+      { "name": "The Stamp Speaks Rule", "body": "Registration state is always a word in a stamp; colour reinforces it, shape distinguishes it (PIENO has a double border).", "section": "colors" },
+      { "name": "The Condensed Is for Dates Rule", "body": "Barlow Condensed is reserved for the board name, flyer dates, stamps and the empty-state heading. Never for body copy, buttons or labels.", "section": "typography" },
+      { "name": "The Free Seats Are Bold Rule", "body": "In the facts row, only the number (free seats, or registrations when full) is bold at 1.05rem; the words around it stay regular.", "section": "typography" },
+      { "name": "The Hung by Hand Rule", "body": "Flyers tilt alternately at most ±0.35deg; notes on cork tilt between ±1 and ±2deg. Anything hovered, pressed or active straightens to 0deg. Never exceed ±2deg.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put every control (favourites, search, filters) on speckled cork and every event on white paper.",
+      "Do lead each flyer with the opening or closing date in Barlow Condensed 700 at 1.85rem.",
+      "Do pair every pin colour with its branch name somewhere visible (chip label, flyer text).",
+      "Do show state as a stamp word; use the double border for PIENO.",
+      "Do keep notes, fields and paper buttons on cork in note-paper cream in both themes.",
+      "Do use the shared ease `cubic-bezier(.16, 1, .3, 1)` for motion, and drop all animation under reduced motion.",
+      "Do use inline stroke SVG icons from the page sprite."
+    ],
+    "donts": [
+      "Don't use pin colours for anything except branch identity.",
+      "Don't tilt anything beyond ±2deg, or tilt flyers beyond ±0.35deg.",
+      "Don't convey state, branch or selection by colour alone.",
+      "Don't use hard offset shadows or deep elevation; paper sits on the board.",
+      "Don't set body copy, labels or buttons in Barlow Condensed.",
+      "Don't use AGESCI or BuonaCaccia logos or branding; the board is an unofficial tool and always credits BuonaCaccia as the source."
+    ]
+  }
+}

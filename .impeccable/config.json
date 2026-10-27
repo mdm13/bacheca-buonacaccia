@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-10-27T09:07:16.755Z",
+        "reason": "Claude: unchosen decision-round sketch of a rejected direction; its fonts belong to that direction, not the shipped system"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-transit.html"
+        ],
+        "createdAt": "2026-10-27T09:07:17.021Z",
+        "reason": "Claude: unchosen decision-round sketch of a rejected direction; its fonts belong to that direction, not the shipped system"
+      }
+    ]
+  }
+}

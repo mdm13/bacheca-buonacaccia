@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bacheca eventi BuonaCaccia</title>
+<meta name="description" content="Eventi AGESCI con iscrizioni aperte o da aprire, ordinati per data di apertura, con posti liberi e filtri preferiti. Dati da BuonaCaccia.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#74502f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3a281a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<svg width="0" height="0" class="sprite" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14v7"/></symbol>
+</svg>
+
+<header class="shell">
+  <div class="shell-top">
+    <h1>Bacheca eventi</h1>
+    <p class="updated" id="aggiornato">Caricamento…</p>
+  </div>
+
+  <section class="pins" aria-labelledby="pins-title" id="preferiti-box" hidden>
+    <h2 id="pins-title" class="visually-hidden">Filtri preferiti</h2>
+    <ul class="pin-row" id="preferiti"></ul>
+    <form class="pin-form" id="form-appunta" hidden>
+      <label for="nome-preferito" class="visually-hidden">Nome del filtro preferito</label>
+      <input id="nome-preferito" name="nome" maxlength="40" required autocomplete="off" placeholder="Nome, es. CFM L/C Veneto">
+      <button type="submit" class="btn btn-paper">Appunta</button>
+      <button type="button" class="btn btn-ghost" id="annulla-appunta">Annulla</button>
+    </form>
+  </section>
+
+  <label class="search">
+    <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+    <span class="visually-hidden">Cerca</span>
+    <input type="search" id="q" placeholder="Cerca evento, luogo, tipologia…" autocomplete="off" enterkeyhint="search">
+  </label>
+</header>
+
+<div class="layout">
+  <aside class="filters" aria-label="Filtri">
+    <div class="quick">
+      <label class="chip chip-select">
+        <span class="visually-hidden">Ordina per</span>
+        <select id="ordine">
+          <option value="prossime">Prossime aperture</option>
+          <option value="apertura">Data apertura iscrizioni</option>
+          <option value="inizio">Data inizio evento</option>
+        </select>
+      </label>
+      <button type="button" class="chip chip-more" id="chip-regione" data-focus="regioni" aria-expanded="false" aria-controls="pannello">
+        <svg class="icon" aria-hidden="true"><use href="#i-filter"/></svg><span>Tutte le regioni</span>
+      </button>
+      <button type="button" class="chip chip-more" id="chip-tipo" data-focus="tipo" aria-expanded="false" aria-controls="pannello">
+        <span>Tutte le tipologie</span>
+      </button>
+      <div class="branche" role="group" aria-label="Branca" id="branche"></div>
+    </div>
+
+    <div class="panel" id="pannello">
+      <fieldset class="group">
+        <legend>Regione</legend>
+        <div class="regions" id="regioni"></div>
+      </fieldset>
+      <div class="group">
+        <label for="tipo" class="group-title">Tipologia</label>
+        <select id="tipo" class="field"></select>
+      </div>
+      <div class="group switches">
+        <label class="switch"><input type="checkbox" id="pieni"><span>Mostra anche gli eventi pieni</span></label>
+        <label class="switch"><input type="checkbox" id="da-aprire"><span>Solo iscrizioni da aprire</span></label>
+      </div>
+      <div class="group actions">
+        <button type="button" class="btn btn-ink" id="appunta">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>Appunta questo filtro
+        </button>
+        <button type="button" class="btn btn-ghost" id="azzera">Azzera filtri</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="board" aria-labelledby="risultati">
+    <p class="meta" id="risultati" aria-live="polite"></p>
+    <ol class="flyers" id="lista" aria-busy="true">
+      <li class="flyer skeleton" aria-hidden="true"></li>
+      <li class="flyer skeleton" aria-hidden="true"></li>
+      <li class="flyer skeleton" aria-hidden="true"></li>
+    </ol>
+    <div class="empty" id="vuoto" hidden></div>
+  </main>
+</div>
+
+<footer class="foot">
+  <p>Strumento non ufficiale. I dati vengono da <a href="https://buonacaccia.agesci.it/Events.aspx" id="fonte">BuonaCaccia</a> e sono aggiornati una volta al giorno: le iscrizioni si fanno solo su BuonaCaccia.</p>
+</footer>
+</body>
+</html>

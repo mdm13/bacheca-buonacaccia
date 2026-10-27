@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sito: avvia",
+      "detail": "Serve site/ su http://localhost:8000 (Ctrl+C nel terminale per fermarlo)",
+      "type": "shell",
+      "command": "uv run python -m http.server 8000 -d site --bind 127.0.0.1",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "http-server",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "activesBegin": true,
+          "beginsPattern": "^Serving HTTP",
+          "endsPattern": "^Serving HTTP"
+        }
+      },
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "Sito: aggiorna dati",
+      "detail": "Scarica gli eventi da BuonaCaccia in site/eventi.json (circa un minuto)",
+      "type": "shell",
+      "command": "uv run buonacaccia --json site/eventi.json",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Sito: aggiorna dati e avvia",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Sito: aggiorna dati", "Sito: avvia"],
+      "problemMatcher": []
+    }
+  ]
+}

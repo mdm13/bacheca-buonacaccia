@@ -1,8 +1,12 @@
-"""Estrae da BuonaCaccia gli eventi di Formazione Capi (Veneto e Nazionale)
-con iscrizioni aperte o da aprire."""
+"""Estrae da BuonaCaccia gli eventi con iscrizioni aperte o da aprire.
+
+Senza opzioni stampa e salva in CSV gli eventi di Formazione Capi di Veneto e
+Nazionale; con --json scrive il dataset completo (tutte le regioni e categorie)
+per la pagina web in site/."""
 
 import argparse
 import csv
+import json
 import sys
 import time
 from dataclasses import asdict, dataclass, fields
@@ -16,24 +20,33 @@ BASE_URL = "https://buonacaccia.agesci.it/"
 EVENTS_URL = BASE_URL + "Events.aspx"
 EVENT_URL = BASE_URL + "Event.aspx?e={}"
 
-# Valori della colonna "Regione" della lista da tenere. Il filtro regione del sito
-# non accetta "Nazionale", quindi si scarica tutto e si filtra qui.
-REGIONI = {"Veneto", "Nazionale"}
-CATEGORIA_FORMAZIONE_CAPI = "4000000"
+# Filtro di default per console e CSV
+REGIONI_DEFAULT = {"Veneto", "Nazionale"}
+CATEGORIA_DEFAULT = "Formazione Capi"
 PAUSA_TRA_RICHIESTE = 0.3  # secondi, per non sovraccaricare il server
 
-# Icona "semaforo" nella colonna Stato della lista
-STATI_SEMAFORO = {
-    "light_red": "Da aprire",
-    "light_green": "Aperte",
-    "light_yellow": "Aperte (lista d'attesa)",
-    "light_dual": "Aperte (lista d'attesa)",
+# Icona della branca nella prima colonna della lista
+CATEGORIE = {
+    "branch_fc": "Formazione Capi",
+    "branch_lc": "L/C",
+    "branch_eg": "E/G",
+    "branch_rs": "R/S",
+    "branch_aa": "Speciale",
+}
+
+# Abbreviazioni usate nella colonna "Regione" della lista (fallback se manca il dettaglio)
+REGIONI_ABBREVIATE = {
+    "EmiRo": "Emilia Romagna",
+    "FVG": "Friuli Venezia Giulia",
+    "TAA": "Trentino Alto Adige",
 }
 
 
 @dataclass
 class Evento:
-    livello: str
+    id: str
+    regione: str
+    categoria: str
     tipo: str
     descrizione: str
     inizio: str
@@ -42,9 +55,15 @@ class Evento:
     chiusura_iscrizioni: str
     posti: int | None
     iscritti: int | None
+    posti_liberi: int | None
     stato: str
+    quota: str
     localita: str
     url: str
+
+    @property
+    def pieno(self) -> bool:
+        return self.posti_liberi is not None and self.posti_liberi <= 0
 
 
 def _parse_data(testo: str) -> date | None:
@@ -52,6 +71,11 @@ def _parse_data(testo: str) -> date | None:
         return datetime.strptime(testo.strip(), "%d/%m/%Y").date()
     except ValueError:
         return None
+
+
+def _iso(testo: str) -> str | None:
+    d = _parse_data(testo)
+    return d.isoformat() if d else None
 
 
 def _get(session: requests.Session, url: str, data: dict | None = None) -> BeautifulSoup:
@@ -84,7 +108,7 @@ def fetch_lista(session: requests.Session) -> list[dict]:
         "__EVENTARGUMENT": "",
         "ctl00$ddlRegionSelector": "",
         "ctl00$MainContent$ddlRegion": "",  # tutte le regioni
-        "ctl00$MainContent$ddlCategory": CATEGORIA_FORMAZIONE_CAPI,
+        "ctl00$MainContent$ddlCategory": "",  # tutte le categorie
         "ctl00$MainContent$ddlSortOrder": "D",
         "ctl00$MainContent$cbShowUseful": "on",
     })
@@ -100,20 +124,22 @@ def fetch_lista(session: requests.Session) -> list[dict]:
         link = tr.find("a", href=lambda h: h and h.startswith("Event.aspx?e="))
         if not link or len(celle) < 11:
             continue
-        semaforo = celle[10].find("img")
-        icona = Path(semaforo["src"]).stem if semaforo else ""
+        branca = celle[0].find("img")
         taken = tr.find(id=lambda i: i and "_Taken_" in i)
         seats = tr.find(id=lambda i: i and "_SeatsMax_" in i)
+        fee = tr.find(id=lambda i: i and "_Fee_" in i)
+        regione = celle[3].get_text(strip=True)
         righe.append({
             "id": link["href"].split("=", 1)[1],
             "titolo": link.get_text(strip=True),
-            "regione": celle[3].get_text(strip=True),
+            "categoria": CATEGORIE.get(Path(branca["src"]).stem, "Altro") if branca else "Altro",
+            "regione": REGIONI_ABBREVIATE.get(regione, regione),
             "inizio": celle[4].get_text(strip=True),
             "fine": celle[5].get_text(strip=True),
+            "quota": fee.get_text(strip=True) if fee else "",
             "localita": celle[7].get_text(strip=True),
             "iscritti": _intero(taken.get_text()) if taken else None,
             "posti": _intero(seats.get_text()) if seats else None,
-            "stato": STATI_SEMAFORO.get(icona, icona),
         })
     return righe
 
@@ -123,6 +149,7 @@ def fetch_dettaglio(session: requests.Session, event_id: str) -> dict:
     p = "MainContent_EventFormView_"
     return {
         "tipo": _testo(soup, p + "Type"),
+        "regione": _testo(soup, p + "lbRegion"),
         "apertura": _testo(soup, p + "lbSubsFrom"),
         "chiusura": _testo(soup, p + "lbSubsTo"),
         "posti": _testo(soup, p + "lbSeats"),
@@ -135,26 +162,28 @@ def raccogli_eventi() -> list[Evento]:
     eventi = []
     with requests.Session() as session:
         session.headers["User-Agent"] = "Mozilla/5.0 (buonacaccia-eventi script)"
-        righe = [r for r in fetch_lista(session) if r["regione"] in REGIONI]
-        for riga in righe:
+        for riga in fetch_lista(session):
             time.sleep(PAUSA_TRA_RICHIESTE)
             det = fetch_dettaglio(session, riga["id"])
             apertura = _parse_data(det["apertura"])
-            stato = riga["stato"]
-            # La data di apertura è il criterio più affidabile per "da aprire"
-            if apertura and apertura > oggi:
-                stato = "Da aprire"
+            posti = _intero(det["posti"]) or riga["posti"]
+            iscritti = _intero(det["iscritti"]) if det["iscritti"] else riga["iscritti"]
             eventi.append(Evento(
-                livello=riga["regione"],
+                id=riga["id"],
+                regione=det["regione"] or riga["regione"],
+                categoria=riga["categoria"],
                 tipo=det["tipo"],
                 descrizione=riga["titolo"],
                 inizio=riga["inizio"],
                 fine=riga["fine"],
                 apertura_iscrizioni=det["apertura"],
                 chiusura_iscrizioni=det["chiusura"],
-                posti=_intero(det["posti"]) or riga["posti"],
-                iscritti=_intero(det["iscritti"]) if det["iscritti"] else riga["iscritti"],
-                stato=stato,
+                posti=posti,
+                iscritti=iscritti,
+                posti_liberi=posti - (iscritti or 0) if posti is not None else None,
+                # La data di apertura è il criterio più affidabile per "da aprire"
+                stato="Da aprire" if apertura and apertura > oggi else "Aperte",
+                quota=riga["quota"],
                 localita=riga["localita"],
                 url=EVENT_URL.format(riga["id"]),
             ))
@@ -164,7 +193,7 @@ def raccogli_eventi() -> list[Evento]:
 
 def stampa_tabella(eventi: list[Evento]) -> None:
     colonne = [
-        ("Livello", "livello"), ("Tipo", "tipo"), ("Descrizione", "descrizione"),
+        ("Regione", "regione"), ("Tipo", "tipo"), ("Descrizione", "descrizione"),
         ("Inizio", "inizio"), ("Fine", "fine"), ("Apertura iscr.", "apertura_iscrizioni"),
         ("Posti", "posti"), ("Iscritti", "iscritti"), ("Stato", "stato"),
     ]
@@ -191,6 +220,27 @@ def salva_csv(eventi: list[Evento], percorso: Path) -> None:
         writer.writerows(asdict(e) for e in eventi)
 
 
+def salva_json(eventi: list[Evento], percorso: Path) -> None:
+    """Dataset per la pagina web: date in ISO per ordinare e confrontare lato browser."""
+    dati = {
+        "aggiornato": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "fonte": EVENTS_URL,
+        "eventi": [
+            {
+                **asdict(e),
+                "inizio": _iso(e.inizio),
+                "fine": _iso(e.fine),
+                "apertura_iscrizioni": _iso(e.apertura_iscrizioni),
+                "chiusura_iscrizioni": _iso(e.chiusura_iscrizioni),
+                "pieno": e.pieno,
+            }
+            for e in eventi
+        ],
+    }
+    percorso.parent.mkdir(parents=True, exist_ok=True)
+    percorso.write_text(json.dumps(dati, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -202,6 +252,10 @@ def main() -> None:
         "--solo-da-aprire", action="store_true",
         help="mostra solo gli eventi con iscrizioni non ancora aperte",
     )
+    parser.add_argument(
+        "--json", type=Path, metavar="PATH",
+        help="scrive in PATH il dataset completo per la pagina web, invece di console e CSV",
+    )
     args = parser.parse_args()
 
     if hasattr(sys.stdout, "reconfigure"):
@@ -212,6 +266,15 @@ def main() -> None:
     except requests.RequestException as exc:
         sys.exit(f"Errore di comunicazione con BuonaCaccia: {exc}")
 
+    if args.json:
+        salva_json(eventi, args.json)
+        print(f"{len(eventi)} eventi salvati in: {args.json.resolve()}")
+        return
+
+    eventi = [
+        e for e in eventi
+        if e.regione in REGIONI_DEFAULT and e.categoria == CATEGORIA_DEFAULT
+    ]
     if args.solo_da_aprire:
         eventi = [e for e in eventi if e.stato == "Da aprire"]
 

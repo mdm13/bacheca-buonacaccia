@@ -1,15 +1,47 @@
 # buonacaccia
 
-Estrae da [BuonaCaccia](https://buonacaccia.agesci.it/Events.aspx) gli eventi di **Formazione Capi**
-del **Veneto** e di livello **Nazionale** con iscrizioni aperte o da aprire, con descrizione, date
-dell'evento, apertura/chiusura iscrizioni, posti e iscritti.
+Estrae da [BuonaCaccia](https://buonacaccia.agesci.it/Events.aspx) gli eventi AGESCI con iscrizioni aperte
+o da aprire e li pubblica in una **bacheca web** (`site/`) dove cercarli per regione, branca e tipologia,
+ordinarli per data di apertura delle iscrizioni, nascondere quelli pieni e salvare i filtri preferiti.
 
-## Uso
+Strumento non ufficiale: i dati vengono da BuonaCaccia e le iscrizioni si fanno solo lì.
+
+## Riga di comando
 
 ```sh
-uv run buonacaccia                       # tabella a video + CSV eventi_formazione_capi_AAAAMMGG.csv
+uv run buonacaccia                       # Formazione Capi Veneto + Nazionale: tabella a video + CSV
 uv run buonacaccia --solo-da-aprire      # solo eventi con iscrizioni non ancora aperte
 uv run buonacaccia -o eventi.csv         # percorso CSV personalizzato
+uv run buonacaccia --json site/eventi.json   # dataset completo (tutte le regioni e categorie) per la bacheca
 ```
 
 Il CSV usa `;` come separatore ed è codificato UTF-8 con BOM, così Excel in italiano lo apre correttamente.
+Lo scaricamento completo legge anche la pagina di dettaglio di ogni evento (~160 eventi, circa un minuto).
+
+## Bacheca web in locale
+
+```sh
+uv run buonacaccia --json site/eventi.json
+uv run python -m http.server 8000 -d site
+```
+
+Poi apri http://localhost:8000. Serve un server: aprendo `index.html` con doppio clic il browser blocca
+la lettura di `eventi.json`.
+
+Nella pagina:
+- i filtri si applicano subito e finiscono nell'indirizzo, quindi il link si può condividere;
+- **+ Appunta filtro** salva il filtro corrente come preferito (nel browser, `localStorage`); un tocco sul
+  biglietto lo riapplica, **Modifica** permette di rinominarlo o eliminarlo;
+- l'ultimo filtro usato viene ripristinato alla visita successiva.
+
+## Pubblicazione su GitHub Pages
+
+Il workflow `.github/workflows/pages.yml` ogni giorno alle 04:00 UTC (e a ogni push su `master`, o a mano
+da *Actions → Aggiorna e pubblica → Run workflow*) scarica gli eventi e pubblica `site/` su GitHub Pages.
+`site/eventi.json` non è nel repository: lo genera il workflow.
+
+Una tantum, dopo aver creato il repository su GitHub:
+
+1. `git remote add origin https://github.com/<utente>/<repo>.git` e `git push -u origin master`;
+2. su GitHub: *Settings → Pages → Build and deployment → Source: GitHub Actions*;
+3. lancia il workflow da *Actions*; il sito sarà su `https://<utente>.github.io/<repo>/`.

@@ -11,3 +11,13 @@ wheels/
 
 # CSV generati
 eventi_formazione_capi_*.csv
+
+# Dati generati (in produzione li crea la GitHub Action)
+site/eventi.json
+
+# Impeccable: stato di build e anteprime locali
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/build/
+.impeccable/questions/
+.impeccable/hook.cache.json
