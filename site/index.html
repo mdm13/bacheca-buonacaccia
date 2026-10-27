@@ -21,6 +21,7 @@
   <symbol id="i-out" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14v7"/></symbol>
 </svg>
 
@@ -58,23 +59,29 @@
           <option value="inizio">data inizio evento</option>
         </select>
       </label>
-      <button type="button" class="chip chip-more" id="chip-regione" data-focus="regioni" aria-expanded="false" aria-controls="pannello">
+      <button type="button" class="chip chip-more" id="chip-regione" aria-haspopup="dialog">
         <svg class="icon" aria-hidden="true"><use href="#i-filter"/></svg><span>Tutte le regioni</span>
       </button>
       <button type="button" class="chip chip-more" id="chip-tipo" data-focus="tipo" aria-expanded="false" aria-controls="pannello">
         <span>Tutte le tipologie</span>
       </button>
       <div class="branche" role="group" aria-labelledby="branche-titolo">
-        <span class="group-title" id="branche-titolo">Categoria</span>
+        <span class="group-head">
+          <span class="group-title" id="branche-titolo">Categoria</span>
+          <span class="mini-links"><button type="button" data-azione="tutte-c">Tutte</button><button type="button" data-azione="nessuna-c">Nessuna</button></span>
+        </span>
         <div class="branche-chips" id="branche"></div>
       </div>
     </div>
 
     <div class="panel" id="pannello">
-      <fieldset class="group">
-        <legend>Regione</legend>
-        <div class="regions" id="regioni"></div>
-      </fieldset>
+      <div class="group" role="group" aria-labelledby="regione-titolo">
+        <span class="group-title" id="regione-titolo">Regione</span>
+        <div class="region-chips" id="regioni-scelte"></div>
+        <button type="button" class="btn btn-paper btn-small" id="scegli-regioni" aria-haspopup="dialog">
+          <svg class="icon" aria-hidden="true"><use href="#i-map"/></svg>Scegli regioni…
+        </button>
+      </div>
       <div class="group">
         <label for="tipo" class="group-title">Tipologia</label>
         <select id="tipo" class="field"></select>
@@ -87,7 +94,7 @@
         <button type="button" class="btn btn-ink" id="appunta">
           <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>Appunta questo filtro
         </button>
-        <button type="button" class="btn btn-ghost" id="azzera">Azzera filtri</button>
+        <button type="button" class="btn btn-ghost" id="azzera">Mostra tutto</button>
       </div>
     </div>
   </aside>
@@ -102,6 +109,35 @@
     <div class="empty" id="vuoto" hidden></div>
   </main>
 </div>
+
+<dialog class="regions-dialog" id="dialogo-regioni" aria-labelledby="dlg-titolo">
+  <form method="dialog" class="dlg">
+    <header class="dlg-head">
+      <h2 id="dlg-titolo">Scegli le regioni</h2>
+      <button class="icon-btn dlg-close" value="chiudi" aria-label="Chiudi"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </header>
+    <div class="dlg-top">
+      <label class="check nazionale"><input type="checkbox" id="chk-nazionale"><span>Eventi nazionali</span><span class="n" id="n-nazionale"></span></label>
+      <div class="seg" role="group" aria-label="Vista">
+        <button type="button" class="chip" id="vista-mappa-btn" aria-pressed="true">Mappa</button>
+        <button type="button" class="chip" id="vista-elenco-btn" aria-pressed="false">Elenco</button>
+      </div>
+    </div>
+    <div class="dlg-body">
+      <div class="vista-mappa" id="vista-mappa">
+        <div class="mappa" id="mappa"><p class="mappa-loading">Carico la mappa…</p></div>
+        <p class="mappa-tip" id="mappa-tip">Tocca una regione per sceglierla, toccala di nuovo per toglierla.</p>
+      </div>
+      <div class="regions" id="regioni" hidden></div>
+    </div>
+    <footer class="dlg-foot">
+      <p class="attrib">Confini regionali: ISTAT, CC BY 4.0 (openpolis)</p>
+      <button type="button" class="btn btn-ghost" id="dlg-tutte">Tutte</button>
+      <button type="button" class="btn btn-ghost" id="dlg-nessuna">Nessuna</button>
+      <button class="btn btn-ink" value="ok" id="dlg-ok">Mostra gli eventi</button>
+    </footer>
+  </form>
+</dialog>
 
 <footer class="foot">
   <p>Strumento non ufficiale. I dati vengono da <a href="https://buonacaccia.agesci.it/Events.aspx" id="fonte">BuonaCaccia</a> e sono aggiornati una volta al giorno: le iscrizioni si fanno solo su BuonaCaccia.</p>

@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-10-27T09:07:17.021Z",
         "reason": "Claude: unchosen decision-round sketch of a rejected direction; its fonts belong to that direction, not the shipped system"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "site/index.html"
+        ],
+        "createdAt": "2026-10-27T10:04:35.881Z",
+        "reason": "Claude: <dialog> has padding 0 by design; its header, toolbar, body and footer bands each carry their own 12-18px inset (verified in screenshots)"
       }
     ]
   }

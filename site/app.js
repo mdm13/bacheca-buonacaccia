@@ -17,9 +17,24 @@ const SPIEGA_ORDINE = {
   apertura: "In ordine di data di apertura delle iscrizioni, dalla più vecchia.",
   inizio: "In ordine di data di inizio dell'evento.",
 };
+// Le 20 regioni con i nomi usati da BuonaCaccia (e da italia-regioni.svg)
+const REGIONI = [
+  "Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia Romagna", "Friuli Venezia Giulia", "Lazio",
+  "Liguria", "Lombardia", "Marche", "Molise", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana",
+  "Trentino Alto Adige", "Umbria", "Valle d'Aosta", "Veneto",
+];
+const NAZIONALE = "Nazionale";
+const KEY_VISTA = "bacheca:vista-regioni";
 const KEY_PREFERITI = "bacheca:preferiti";
 const KEY_ULTIMO = "bacheca:ultimo";
-const DEFAULT = { r: [], c: [], t: "", q: "", o: "apertura", pieni: false, daAprire: false };
+const TUTTE_REGIONI = [NAZIONALE, ...REGIONI];
+const TUTTE_BRANCHE = BRANCHE.map((b) => b.id);
+// Selezione esplicita: si vede solo ciò che è selezionato. All'avvio è selezionato tutto.
+// v: 2 distingue questo formato dal precedente, dove un elenco vuoto voleva dire "tutte".
+const DEFAULT = {
+  v: 2, r: [...TUTTE_REGIONI], c: [...TUTTE_BRANCHE], t: "", q: "", o: "apertura", pieni: false, daAprire: false,
+};
+const tutte = (lista, universo) => universo.every((x) => lista.includes(x));
 
 const $ = (id) => document.getElementById(id);
 const el = {
@@ -27,6 +42,10 @@ const el = {
   formAppunta: $("form-appunta"), nomePreferito: $("nome-preferito"), annulla: $("annulla-appunta"),
   q: $("q"), ordine: $("ordine"), branche: $("branche"), chipRegione: $("chip-regione"), chipTipo: $("chip-tipo"),
   pannello: $("pannello"), regioni: $("regioni"), tipo: $("tipo"), pieni: $("pieni"), daAprire: $("da-aprire"),
+  regioniScelte: $("regioni-scelte"), scegliRegioni: $("scegli-regioni"), dialogo: $("dialogo-regioni"),
+  chkNazionale: $("chk-nazionale"), nNazionale: $("n-nazionale"), mappa: $("mappa"), mappaTip: $("mappa-tip"),
+  vistaMappa: $("vista-mappa"), btnMappa: $("vista-mappa-btn"), btnElenco: $("vista-elenco-btn"),
+  dlgNessuna: $("dlg-nessuna"), dlgTutte: $("dlg-tutte"), dlgOk: $("dlg-ok"),
   appunta: $("appunta"), azzera: $("azzera"), risultati: $("risultati"), lista: $("lista"), vuoto: $("vuoto"),
 };
 
@@ -34,6 +53,8 @@ let eventi = [];
 let filtri = { ...DEFAULT };
 let preferiti = [];
 let gestione = false;
+let perRegione = new Map();
+let mappaPronta = null;
 let storageOk = true;
 
 /* ---------- storage sicuro ---------- */
@@ -86,7 +107,8 @@ function prepara(e) {
   const daAprire = apertura ? apertura > oggi : false;
   const durata = inizio && fine ? giorni(inizio, fine) + 1 : null;
   return {
-    ...e, quota: /\d/.test(e.quota || "") ? e.quota : "", apertura, chiusura, inizio, fine, daAprire, durata,
+    ...e, categoria: PIN[e.categoria] ? e.categoria : "Speciale",
+    quota: /\d/.test(e.quota || "") ? e.quota : "", apertura, chiusura, inizio, fine, daAprire, durata,
     testo: [e.descrizione, e.tipo, e.regione, e.localita, e.categoria].join(" ").toLowerCase(),
   };
 }
@@ -95,8 +117,8 @@ function prepara(e) {
 function filtra(lista, f, ignoraPieni = false) {
   const q = f.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   return lista.filter((e) =>
-    (!f.r.length || f.r.includes(e.regione)) &&
-    (!f.c.length || f.c.includes(e.categoria)) &&
+    (f.r.includes(e.regione) || (!TUTTE_REGIONI.includes(e.regione) && tutte(f.r, TUTTE_REGIONI))) &&
+    f.c.includes(e.categoria) &&
     (!f.t || e.tipo === f.t) &&
     (ignoraPieni || f.pieni || !e.pieno) &&
     (!f.daAprire || e.daAprire) &&
@@ -114,7 +136,19 @@ function ordina(lista, o) {
 
 const stessiFiltri = (a, b) => JSON.stringify(normalizza(a)) === JSON.stringify(normalizza(b));
 function normalizza(f) {
-  const n = { ...DEFAULT, ...f, r: [...(f.r || [])].sort(), c: [...(f.c || [])].sort(), q: (f.q || "").trim() };
+  let r = [...(f.r || [])];
+  let c = [...(f.c || [])];
+  if (!f.v) {
+    // Formato precedente (preferiti e ultimo filtro salvati prima): elenco vuoto = tutte
+    if (!r.length) r = [...TUTTE_REGIONI];
+    if (!c.length) c = [...TUTTE_BRANCHE];
+  }
+  const n = {
+    ...DEFAULT, ...f, v: 2,
+    r: r.filter((x) => TUTTE_REGIONI.includes(x)).sort(),
+    c: c.filter((x) => TUTTE_BRANCHE.includes(x)).sort(),
+    q: (f.q || "").trim(),
+  };
   // Ordinamenti non più disponibili (es. "prossime" in preferiti o link vecchi) tornano al default
   if (!(n.o in SPIEGA_ORDINE)) n.o = DEFAULT.o;
   return n;
@@ -124,16 +158,17 @@ function normalizza(f) {
 function daQuery() {
   const p = new URLSearchParams(location.search);
   if (![...p.keys()].length) return null;
-  const lista = (k) => (p.get(k) ? p.get(k).split(",").filter(Boolean) : []);
+  // Parametro assente = tutte; presente ma vuoto = nessuna
+  const lista = (k, tutti) => (p.has(k) ? p.get(k).split(",").filter(Boolean) : [...tutti]);
   return normalizza({
-    r: lista("regione"), c: lista("branca"), t: p.get("tipo") || "", q: p.get("q") || "",
+    v: 2, r: lista("regione", TUTTE_REGIONI), c: lista("branca", TUTTE_BRANCHE), t: p.get("tipo") || "", q: p.get("q") || "",
     o: p.get("ordine") || DEFAULT.o, pieni: p.get("pieni") === "1", daAprire: p.get("da_aprire") === "1",
   });
 }
 function aQuery(f) {
   const p = new URLSearchParams();
-  if (f.r.length) p.set("regione", f.r.join(","));
-  if (f.c.length) p.set("branca", f.c.join(","));
+  if (!tutte(f.r, TUTTE_REGIONI)) p.set("regione", f.r.join(","));
+  if (!tutte(f.c, TUTTE_BRANCHE)) p.set("branca", f.c.join(","));
   if (f.t) p.set("tipo", f.t);
   if (f.q.trim()) p.set("q", f.q.trim());
   if (f.o !== DEFAULT.o) p.set("ordine", f.o);
@@ -162,24 +197,20 @@ function costruisciControlli() {
   }));
 
   const conteggio = (campo) => eventi.reduce((m, e) => m.set(e[campo], (m.get(e[campo]) || 0) + 1), new Map());
-  const perRegione = conteggio("regione");
-  const regioni = [...perRegione.keys()].sort((a, b) =>
-    a === "Nazionale" ? -1 : b === "Nazionale" ? 1 : a.localeCompare(b, "it"));
-  el.regioni.replaceChildren(...regioni.map((r) => {
+  perRegione = conteggio("regione");
+  el.nNazionale.textContent = perRegione.get(NAZIONALE) || 0;
+  el.regioni.replaceChildren(...REGIONI.map((r) => {
     const label = document.createElement("label");
     label.className = "check";
     const input = document.createElement("input");
     input.type = "checkbox";
     input.value = r;
-    input.addEventListener("change", () => {
-      const sel = [...el.regioni.querySelectorAll("input:checked")].map((i) => i.value);
-      aggiorna({ r: sel });
-    });
+    input.addEventListener("change", () => scegliRegione(r, input.checked));
     const nome = document.createElement("span");
     nome.textContent = r;
     const n = document.createElement("span");
     n.className = "n";
-    n.textContent = perRegione.get(r);
+    n.textContent = perRegione.get(r) || 0;
     label.append(input, nome, n);
     return label;
   }));
@@ -196,12 +227,146 @@ function sincronizzaControlli() {
   el.daAprire.checked = filtri.daAprire;
   el.branche.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", filtri.c.includes(b.dataset.branca)));
   el.regioni.querySelectorAll("input").forEach((i) => { i.checked = filtri.r.includes(i.value); });
-  const r = filtri.r;
-  el.chipRegione.lastElementChild.textContent =
-    !r.length ? "Tutte le regioni" : r.length === 1 ? r[0] : `${r[0]} +${r.length - 1}`;
-  el.chipRegione.classList.toggle("is-set", r.length > 0);
+  el.chkNazionale.checked = filtri.r.includes(NAZIONALE);
+  renderChipRegioni();
+  sincronizzaMappa();
+  const n = filtra(eventi, filtri).length;
+  el.dlgOk.textContent = `Mostra ${n} ${n === 1 ? "evento" : "eventi"}`;
+  el.chipRegione.lastElementChild.textContent = descriviRegioni(filtri.r);
+  el.chipRegione.classList.toggle("is-set", !tutte(filtri.r, TUTTE_REGIONI));
   el.chipTipo.firstElementChild.textContent = filtri.t || "Tutte le tipologie";
   el.chipTipo.classList.toggle("is-set", !!filtri.t);
+}
+
+/* ---------- regioni: chip, finestra e mappa ---------- */
+function scegliRegione(nome, attiva) {
+  const r = new Set(filtri.r);
+  attiva ? r.add(nome) : r.delete(nome);
+  aggiorna({ r: [...r] });
+}
+
+const etichettaRegione = (r) => (r === NAZIONALE ? "Eventi nazionali" : r);
+const contaEventi = (n) => `${n} ${n === 1 ? "evento" : "eventi"}`;
+
+const ordinaRegioni = (r) => [...r].sort((a, b) =>
+  a === NAZIONALE ? -1 : b === NAZIONALE ? 1 : a.localeCompare(b, "it"));
+
+function descriviRegioni(r) {
+  if (tutte(r, TUTTE_REGIONI)) return "Tutte le regioni";
+  if (!r.length) return "Nessuna regione";
+  if (r.length === 1) return etichettaRegione(r[0]);
+  if (r.length <= 4) return `${etichettaRegione(ordinaRegioni(r)[0])} +${r.length - 1}`;
+  const n = r.filter((x) => x !== NAZIONALE).length;
+  return `${n} regioni${r.includes(NAZIONALE) ? " + nazionali" : ""}`;
+}
+
+function renderChipRegioni() {
+  const r = filtri.r;
+  if (tutte(r, TUTTE_REGIONI) || !r.length || r.length > 4) {
+    // Riepilogo: tutte, nessuna o molte regioni. Il tocco apre la finestra.
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "region-none" + (r.length ? "" : " is-empty");
+    btn.textContent = tutte(r, TUTTE_REGIONI) ? "Tutte le regioni e gli eventi nazionali" : descriviRegioni(r);
+    btn.addEventListener("click", apriRegioni);
+    el.regioniScelte.replaceChildren(btn);
+    return;
+  }
+  el.regioniScelte.replaceChildren(...ordinaRegioni(r).map((r) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip-x";
+    btn.setAttribute("aria-label", `Togli ${etichettaRegione(r)}`);
+    btn.append(etichettaRegione(r));
+    btn.insertAdjacentHTML("beforeend", `<svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>`);
+    btn.addEventListener("click", () => scegliRegione(r, false));
+    return btn;
+  }));
+}
+
+function caricaMappa() {
+  mappaPronta ??= fetch("italia-regioni.svg")
+    .then((resp) => {
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return resp.text();
+    })
+    .then((testo) => {
+      const svg = document.importNode(new DOMParser().parseFromString(testo, "image/svg+xml").documentElement, true);
+      svg.setAttribute("role", "group");
+      svg.setAttribute("aria-label", "Mappa delle regioni");
+      svg.classList.add("mappa-svg");
+      const puntine = document.createElementNS(svg.namespaceURI, "g");
+      puntine.setAttribute("aria-hidden", "true");
+      for (const path of svg.querySelectorAll("path[data-regione]")) {
+        const nome = path.dataset.regione;
+        path.setAttribute("role", "checkbox");
+        path.addEventListener("click", () => attivaPath(path));
+        path.addEventListener("keydown", (ev) => {
+          if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); attivaPath(path); }
+        });
+        for (const tipo of ["pointerenter", "focus"]) {
+          path.addEventListener(tipo, () => {
+            el.mappaTip.textContent = `${nome} · ${contaEventi(perRegione.get(nome) || 0)}`;
+          });
+        }
+        const pin = document.createElementNS(svg.namespaceURI, "circle");
+        pin.setAttribute("cx", path.dataset.cx);
+        pin.setAttribute("cy", path.dataset.cy);
+        pin.setAttribute("r", "5");
+        pin.dataset.regione = nome;
+        puntine.append(pin);
+      }
+      puntine.classList.add("mappa-puntine");
+      svg.append(puntine);
+      el.mappa.replaceChildren(svg);
+      sincronizzaMappa();
+    })
+    .catch(() => {
+      mappaPronta = null;
+      el.mappa.innerHTML = `<p class="mappa-loading">La mappa non si è caricata: usa l'elenco.</p>`;
+      impostaVista("elenco", false);
+    });
+  return mappaPronta;
+}
+
+function attivaPath(path) {
+  scegliRegione(path.dataset.regione, path.getAttribute("aria-checked") !== "true");
+}
+
+function sincronizzaMappa() {
+  const svg = el.mappa.querySelector("svg");
+  if (!svg) return;
+  for (const path of svg.querySelectorAll("path[data-regione]")) {
+    const nome = path.dataset.regione;
+    const n = perRegione.get(nome) || 0;
+    const scelta = filtri.r.includes(nome);
+    path.setAttribute("aria-checked", scelta);
+    path.setAttribute("aria-label", `${nome}, ${contaEventi(n)}`);
+    path.setAttribute("tabindex", "0");
+    path.classList.toggle("scelta", scelta);
+    path.classList.toggle("vuota", !n);
+  }
+  // Con tutto selezionato 20 puntine sarebbero solo rumore: compaiono quando la scelta è mirata
+  const tutto = tutte(filtri.r, TUTTE_REGIONI);
+  svg.querySelectorAll(".mappa-puntine circle").forEach((c) => {
+    c.classList.toggle("on", !tutto && filtri.r.includes(c.dataset.regione));
+  });
+}
+
+function impostaVista(vista, ricorda = true) {
+  const mappa = vista === "mappa";
+  el.vistaMappa.hidden = !mappa;
+  el.regioni.hidden = mappa;
+  el.btnMappa.setAttribute("aria-pressed", mappa);
+  el.btnElenco.setAttribute("aria-pressed", !mappa);
+  if (mappa) caricaMappa();
+  if (ricorda) scrivi(KEY_VISTA, vista);
+}
+
+function apriRegioni() {
+  const vista = leggi(KEY_VISTA, matchMedia("(min-width: 600px)").matches ? "mappa" : "elenco");
+  impostaVista(vista === "elenco" ? "elenco" : "mappa", false);
+  el.dialogo.showModal();
 }
 
 /* ---------- render: preferiti ---------- */
@@ -280,8 +445,10 @@ function renderPreferiti() {
 function suggerisciNome() {
   const parti = [];
   if (filtri.t) parti.push(filtri.t);
-  else if (filtri.c.length) parti.push(filtri.c.join(" + "));
-  if (filtri.r.length) parti.push(filtri.r.length > 2 ? `${filtri.r.length} regioni` : filtri.r.join(" + "));
+  else if (!tutte(filtri.c, TUTTE_BRANCHE)) parti.push(filtri.c.join(" + "));
+  if (!tutte(filtri.r, TUTTE_REGIONI)) {
+    parti.push(filtri.r.length > 2 ? descriviRegioni(filtri.r) : filtri.r.map(etichettaRegione).join(" + "));
+  }
   if (filtri.q.trim()) parti.push(`“${filtri.q.trim()}”`);
   return parti.join(" ") || "Tutti gli eventi";
 }
@@ -355,11 +522,18 @@ function renderLista() {
     `<span class="ordine">${SPIEGA_ORDINE[filtri.o] || ""}</span>`;
 
   el.vuoto.hidden = visibili.length > 0;
-  if (!visibili.length) {
+  if (!visibili.length && (!filtri.r.length || !filtri.c.length)) {
+    const cosa = !filtri.r.length ? "nessuna regione" : "nessuna categoria";
+    el.vuoto.innerHTML = `<h3>Non hai selezionato ${cosa}</h3>
+      <p>La bacheca mostra solo gli eventi delle regioni e delle categorie selezionate.</p>
+      <div class="actions"><button type="button" class="btn btn-ink" data-azione="${!filtri.r.length ? "tutte-r" : "tutte-c"}">
+      Seleziona ${!filtri.r.length ? "tutte le regioni" : "tutte le categorie"}</button>
+      <button type="button" class="btn btn-ghost" data-azione="azzera">Mostra tutto</button></div>`;
+  } else if (!visibili.length) {
     el.vuoto.innerHTML = `<h3>Nessuna locandina con questi filtri</h3>
-      <p>${pieniNascosti ? `Ci sono ${pieniNascosti} eventi pieni che corrispondono: puoi mostrarli, o allargare i filtri.` : "Prova a togliere una regione o la tipologia, oppure azzera i filtri."}</p>
+      <p>${pieniNascosti ? `Ci sono ${pieniNascosti} eventi pieni che corrispondono: puoi mostrarli, o allargare i filtri.` : "Prova ad aggiungere regioni o categorie, a togliere la tipologia, oppure mostra tutto."}</p>
       <div class="actions">${pieniNascosti ? `<button type="button" class="btn btn-ink" data-azione="pieni">Mostra gli eventi pieni</button>` : ""}
-      <button type="button" class="btn btn-ghost" data-azione="azzera">Azzera filtri</button></div>`;
+      <button type="button" class="btn btn-ghost" data-azione="azzera">Mostra tutto</button></div>`;
   }
 }
 
@@ -394,19 +568,27 @@ function collega() {
   el.azzera.addEventListener("click", () => aggiorna({ ...DEFAULT }));
   el.appunta.addEventListener("click", apriFormAppunta);
   el.annulla.addEventListener("click", () => { el.formAppunta.hidden = true; });
-  for (const chip of [el.chipRegione, el.chipTipo]) {
-    chip.addEventListener("click", () => {
-      const open = chip.getAttribute("aria-expanded") !== "true";
-      el.pannello.classList.toggle("open", open);
-      el.chipRegione.setAttribute("aria-expanded", open);
-      el.chipTipo.setAttribute("aria-expanded", open);
-      if (open) {
-        const target = chip.dataset.focus === "tipo" ? el.tipo : el.regioni.querySelector("input");
-        target?.focus({ preventScroll: true });
-        el.pannello.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      }
-    });
-  }
+  el.chipTipo.addEventListener("click", () => {
+    const open = el.chipTipo.getAttribute("aria-expanded") !== "true";
+    el.pannello.classList.toggle("open", open);
+    el.chipTipo.setAttribute("aria-expanded", open);
+    if (open) {
+      el.tipo.focus({ preventScroll: true });
+      el.pannello.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  });
+  el.chipRegione.addEventListener("click", apriRegioni);
+  el.scegliRegioni.addEventListener("click", apriRegioni);
+  el.chkNazionale.addEventListener("change", () => scegliRegione(NAZIONALE, el.chkNazionale.checked));
+  el.btnMappa.addEventListener("click", () => impostaVista("mappa"));
+  el.btnElenco.addEventListener("click", () => impostaVista("elenco"));
+  el.dlgNessuna.addEventListener("click", () => aggiorna({ r: [] }));
+  el.dlgTutte.addEventListener("click", () => aggiorna({ r: [...TUTTE_REGIONI] }));
+  // Clic sullo sfondo fuori dalla finestra: chiude
+  el.dialogo.addEventListener("click", (ev) => { if (ev.target === el.dialogo) el.dialogo.close(); });
+  el.mappa.addEventListener("pointerleave", () => {
+    el.mappaTip.textContent = "Tocca una regione per sceglierla, toccala di nuovo per toglierla.";
+  });
   el.formAppunta.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const nome = el.nomePreferito.value.trim();
@@ -420,6 +602,9 @@ function collega() {
     const azione = ev.target.closest("[data-azione]")?.dataset.azione;
     if (azione === "pieni") aggiorna({ pieni: true });
     if (azione === "azzera") aggiorna({ ...DEFAULT });
+    if (azione === "tutte-r") aggiorna({ r: [...TUTTE_REGIONI] });
+    if (azione === "tutte-c") aggiorna({ c: [...TUTTE_BRANCHE] });
+    if (azione === "nessuna-c") aggiorna({ c: [] });
   });
 }
 

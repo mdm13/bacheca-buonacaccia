@@ -32,7 +32,13 @@ Nella pagina:
 - i filtri si applicano subito e finiscono nell'indirizzo, quindi il link si può condividere;
 - **+ Appunta filtro** salva il filtro corrente come preferito (nel browser, `localStorage`); un tocco sul
   biglietto lo riapplica, **Modifica** permette di rinominarlo o eliminarlo;
-- l'ultimo filtro usato viene ripristinato alla visita successiva.
+- l'ultimo filtro usato viene ripristinato alla visita successiva;
+- **Scegli regioni…** apre una finestra con la mappa d'Italia (clic sulle regioni) o l'elenco, più la
+  casella per gli eventi nazionali; le regioni scelte compaiono come chip nell'area filtri.
+
+La mappa (`site/italia-regioni.svg`) è generata da `tools/genera_mappa.py` dai confini regionali
+**ISTAT** (licenza [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), tramite
+[openpolis/geojson-italy](https://github.com/openpolis/geojson-italy).
 
 ## Pubblicazione su GitHub Pages
 
