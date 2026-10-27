@@ -12,9 +12,14 @@ const BRANCHE = [
 ];
 const PIN = Object.fromEntries(BRANCHE.map((b) => [b.id, b.pin]));
 const TILTS = ["-2deg", "1.5deg", "-1deg", "2deg", "-1.5deg"];
+// Frase mostrata sotto il conteggio, per dire in che ordine si sta leggendo
+const SPIEGA_ORDINE = {
+  apertura: "In ordine di data di apertura delle iscrizioni, dalla più vecchia.",
+  inizio: "In ordine di data di inizio dell'evento.",
+};
 const KEY_PREFERITI = "bacheca:preferiti";
 const KEY_ULTIMO = "bacheca:ultimo";
-const DEFAULT = { r: [], c: [], t: "", q: "", o: "prossime", pieni: false, daAprire: false };
+const DEFAULT = { r: [], c: [], t: "", q: "", o: "apertura", pieni: false, daAprire: false };
 
 const $ = (id) => document.getElementById(id);
 const el = {
@@ -59,6 +64,7 @@ const fmtAnno = new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short
 const fmtOra = new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
 function traGiorni(n) {
+  if (n < 0) return "in corso";
   if (n === 0) return "oggi";
   if (n === 1) return "domani";
   return `tra ${n} giorni`;
@@ -103,18 +109,15 @@ function ordina(lista, o) {
   const t = (d) => (d ? +d : MAX_DATA);
   const copia = [...lista];
   if (o === "inizio") return copia.sort((a, b) => t(a.inizio) - t(b.inizio));
-  if (o === "apertura") return copia.sort((a, b) => t(a.apertura) - t(b.apertura) || t(a.inizio) - t(b.inizio));
-  // "prossime": prima quelle da aprire (la più vicina in alto), poi le aperte che chiudono prima
-  return copia.sort((a, b) => {
-    if (a.daAprire !== b.daAprire) return a.daAprire ? -1 : 1;
-    if (a.daAprire) return t(a.apertura) - t(b.apertura);
-    return t(a.chiusura) - t(b.chiusura) || t(a.inizio) - t(b.inizio);
-  });
+  return copia.sort((a, b) => t(a.apertura) - t(b.apertura) || t(a.inizio) - t(b.inizio));
 }
 
 const stessiFiltri = (a, b) => JSON.stringify(normalizza(a)) === JSON.stringify(normalizza(b));
 function normalizza(f) {
-  return { ...DEFAULT, ...f, r: [...(f.r || [])].sort(), c: [...(f.c || [])].sort(), q: (f.q || "").trim() };
+  const n = { ...DEFAULT, ...f, r: [...(f.r || [])].sort(), c: [...(f.c || [])].sort(), q: (f.q || "").trim() };
+  // Ordinamenti non più disponibili (es. "prossime" in preferiti o link vecchi) tornano al default
+  if (!(n.o in SPIEGA_ORDINE)) n.o = DEFAULT.o;
+  return n;
 }
 
 /* ---------- query string ---------- */
@@ -293,18 +296,27 @@ function apriFormAppunta() {
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 function locandina(e) {
-  let data, conto, timbro;
-  if (e.daAprire) {
+  // La data grande è sempre quella su cui si sta ordinando; le altre vanno nella nota accanto al timbro
+  let data, conto, nota = "";
+  const chiuse = e.chiusura && e.chiusura < oggi;
+  const chiude = e.chiusura ? `${chiuse ? "chiusa" : "chiude"} ${fmtBreve.format(e.chiusura)}` : "";
+  if (filtri.o === "inizio" && e.inizio) {
+    data = `Inizia ${fmtGiorno.format(e.inizio)}`;
+    conto = traGiorni(giorni(oggi, e.inizio));
+    nota = e.daAprire ? `apre ${fmtBreve.format(e.apertura)}` : chiude;
+  } else if (e.daAprire) {
     data = `Apre ${fmtGiorno.format(e.apertura)}`;
     conto = traGiorni(giorni(oggi, e.apertura));
-    timbro = `<span class="stamp soon">DA APRIRE</span>`;
+  } else if (filtri.o === "apertura" && e.apertura) {
+    data = `Aperte dal ${fmtBreve.format(e.apertura)}`;
+    conto = chiude;
   } else {
-    const chiuse = e.chiusura && e.chiusura < oggi;
     data = e.chiusura ? `${chiuse ? "Chiusa" : "Chiude"} ${fmtGiorno.format(e.chiusura)}` : "Iscrizioni aperte";
     conto = e.chiusura && !chiuse ? traGiorni(giorni(oggi, e.chiusura)) : "";
-    timbro = `<span class="stamp open">APERTE</span>` +
-      (e.apertura ? `<span class="stamp-note">dal ${fmtBreve.format(e.apertura)}</span>` : "");
+    nota = e.apertura ? `dal ${fmtBreve.format(e.apertura)}` : "";
   }
+  let timbro = (e.daAprire ? `<span class="stamp soon">DA APRIRE</span>` : `<span class="stamp open">APERTE</span>`) +
+    (nota ? `<span class="stamp-note">${esc(nota)}</span>` : "");
   if (e.pieno) timbro = `<span class="stamp full">PIENO</span><span class="stamp-note">lista d'attesa su BuonaCaccia</span>`;
 
   let posti;
@@ -314,7 +326,7 @@ function locandina(e) {
 
   const durata = e.durata
     ? `<div class="dur"><div class="dur-bar" aria-hidden="true"><i style="--w:${Math.min(100, Math.max(8, (e.durata / 8) * 100))}%"></i></div>` +
-      `<span class="dur-label">${e.durata === 1 ? "1 giorno" : e.durata > 31 ? `modulare, ${Math.round(e.durata / 30)} mesi` : `${e.durata} giorni`}</span></div>`
+      `<span class="dur-label">${e.durata === 1 ? "1 giorno" : e.durata > 45 ? `modulare, ${Math.round(e.durata / 30)} mesi` : `${e.durata} giorni`}</span></div>`
     : `<div class="dur"></div>`;
 
   // La tipologia si ripete spesso all'inizio del titolo: in quel caso non serve ripeterla
@@ -339,7 +351,8 @@ function renderLista() {
 
   const nome = visibili.length === 1 ? "evento" : "eventi";
   el.risultati.innerHTML = `<span><b>${visibili.length}</b> ${nome}${filtri.pieni ? "" : " con posti liberi o non indicati"}</span>` +
-    (pieniNascosti ? `<span>· ${pieniNascosti} pieni nascosti</span><button type="button" data-azione="pieni">Mostrali</button>` : "");
+    (pieniNascosti ? `<span>· ${pieniNascosti} pieni nascosti</span><button type="button" data-azione="pieni">Mostrali</button>` : "") +
+    `<span class="ordine">${SPIEGA_ORDINE[filtri.o] || ""}</span>`;
 
   el.vuoto.hidden = visibili.length > 0;
   if (!visibili.length) {

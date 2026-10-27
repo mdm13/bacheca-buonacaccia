@@ -52,11 +52,10 @@
   <aside class="filters" aria-label="Filtri">
     <div class="quick">
       <label class="chip chip-select">
-        <span class="visually-hidden">Ordina per</span>
+        <span class="chip-label">Ordina:</span>
         <select id="ordine">
-          <option value="prossime">Prossime aperture</option>
-          <option value="apertura">Data apertura iscrizioni</option>
-          <option value="inizio">Data inizio evento</option>
+          <option value="apertura">data apertura iscrizioni</option>
+          <option value="inizio">data inizio evento</option>
         </select>
       </label>
       <button type="button" class="chip chip-more" id="chip-regione" data-focus="regioni" aria-expanded="false" aria-controls="pannello">
@@ -65,7 +64,10 @@
       <button type="button" class="chip chip-more" id="chip-tipo" data-focus="tipo" aria-expanded="false" aria-controls="pannello">
         <span>Tutte le tipologie</span>
       </button>
-      <div class="branche" role="group" aria-label="Branca" id="branche"></div>
+      <div class="branche" role="group" aria-labelledby="branche-titolo">
+        <span class="group-title" id="branche-titolo">Categoria</span>
+        <div class="branche-chips" id="branche"></div>
+      </div>
     </div>
 
     <div class="panel" id="pannello">
