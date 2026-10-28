@@ -40,10 +40,14 @@ La mappa (`site/italia-regioni.svg`) è generata da `tools/genera_mappa.py` dai 
 **ISTAT** (licenza [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), tramite
 [openpolis/geojson-italy](https://github.com/openpolis/geojson-italy).
 
+La pagina si può installare come app (*Aggiungi a Home* su iPhone, *Installa app* su Android, Chrome ed
+Edge): nome e icona vengono da `site/manifest.webmanifest` e `site/icons/`. Le icone ridisegnano
+`site/favicon.svg`; se cambia, rigenerale con `uv run --with pillow python tools/genera_icone.py`.
+
 ## Pubblicazione su GitHub Pages
 
-Il workflow `.github/workflows/pages.yml` ogni giorno alle 04:00 UTC (e a ogni push su `master`, o a mano
-da *Actions → Aggiorna e pubblica → Run workflow*) scarica gli eventi e pubblica `site/` su GitHub Pages.
+Il workflow `.github/workflows/pages.yml` due volte al giorno, alle 03:23 e alle 15:23 UTC (e a ogni push su
+`master`, o a mano da *Actions → Aggiorna e pubblica → Run workflow*) scarica gli eventi e pubblica `site/` su GitHub Pages.
 `site/eventi.json` non è nel repository: lo genera il workflow.
 
 Una tantum, dopo aver creato il repository su GitHub:
