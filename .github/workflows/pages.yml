@@ -2,7 +2,9 @@ name: Aggiorna e pubblica
 
 on:
   schedule:
-    - cron: "0 4 * * *"  # ogni giorno alle 04:00 UTC (05:00/06:00 in Italia)
+    # due volte al giorno alle 03:23 e 15:23 UTC; fuori dall'ora piena, dove
+    # GitHub ritarda o salta più spesso le esecuzioni programmate
+    - cron: "23 3,15 * * *"
   workflow_dispatch:
   push:
     branches: [master]
