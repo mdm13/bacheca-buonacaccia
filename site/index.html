@@ -11,6 +11,19 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- Anteprima nei link condivisi (WhatsApp, Telegram, social): URL assoluti, da cambiare se cambia l'indirizzo del sito -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bacheca eventi BuonaCaccia">
+<meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Bacheca eventi BuonaCaccia">
+<meta property="og:description" content="Eventi AGESCI con iscrizioni aperte o da aprire, con posti liberi, per regione, branca e tipologia.">
+<meta property="og:url" content="https://mdm13.github.io/bacheca-buonacaccia/">
+<meta property="og:image" content="https://mdm13.github.io/bacheca-buonacaccia/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bacheca di sughero con locandine appuntate: eventi AGESCI da BuonaCaccia">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="apple-mobile-web-app-title" content="Bacheca eventi">
 <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -25,13 +38,19 @@
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14v7"/></symbol>
 </svg>
 
 <header class="shell">
   <div class="shell-top">
     <h1>Bacheca eventi</h1>
-    <p class="updated" id="aggiornato">Caricamento…</p>
+    <div class="shell-tools">
+      <p class="updated" id="aggiornato">Caricamento…</p>
+      <button type="button" class="btn-share" id="condividi" title="Condividi questa selezione">
+        <svg class="icon" aria-hidden="true"><use href="#i-share"/></svg><span>Condividi</span>
+      </button>
+    </div>
   </div>
 
   <section class="pins" aria-labelledby="pins-title" id="preferiti-box" hidden>

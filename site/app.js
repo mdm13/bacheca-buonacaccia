@@ -47,6 +47,7 @@ const el = {
   vistaMappa: $("vista-mappa"), btnMappa: $("vista-mappa-btn"), btnElenco: $("vista-elenco-btn"),
   dlgNessuna: $("dlg-nessuna"), dlgTutte: $("dlg-tutte"), dlgOk: $("dlg-ok"),
   appunta: $("appunta"), azzera: $("azzera"), risultati: $("risultati"), lista: $("lista"), vuoto: $("vuoto"),
+  condividi: $("condividi"),
 };
 
 let eventi = [];
@@ -459,6 +460,61 @@ function apriFormAppunta() {
   el.nomePreferito.select();
 }
 
+/* ---------- condivisione ---------- */
+// WhatsApp e simili mostrano per ogni link la stessa anteprima (meta og: in index.html):
+// la selezione viaggia nel testo del messaggio, con i primi eventi in elenco.
+const MAX_CONDIVISI = 5;
+
+function testoCondivisione() {
+  const visibili = ordina(filtra(eventi, filtri), filtri.o);
+  const parti = [contaEventi(visibili.length)];
+  if (filtri.t) parti.push(filtri.t);
+  else if (!tutte(filtri.c, TUTTE_BRANCHE)) parti.push(filtri.c.join(", "));
+  // Nel messaggio le regioni scelte si leggono per esteso, se poche
+  const r = filtri.r;
+  parti.push(r.length && r.length <= 4 && !tutte(r, TUTTE_REGIONI) ? ordinaRegioni(r).map(etichettaRegione).join(", ") : descriviRegioni(r));
+  if (filtri.q.trim()) parti.push(`“${filtri.q.trim()}”`);
+  if (filtri.daAprire) parti.push("iscrizioni da aprire");
+  else if (!filtri.pieni) parti.push("con posti liberi");
+
+  const righe = visibili.slice(0, MAX_CONDIVISI).map((e) => {
+    const dove = [e.regione, e.localita].filter(Boolean).join(", ");
+    let stato;
+    if (e.pieno) stato = "PIENO";
+    else if (e.daAprire) stato = `iscrizioni dal ${fmtBreve.format(e.apertura)}`;
+    else if (e.chiusura && e.chiusura >= oggi) stato = `iscrizioni fino al ${fmtBreve.format(e.chiusura)}`;
+    else stato = "iscrizioni aperte";
+    return `• ${intervallo(e.inizio, e.fine) || "data da definire"} – ${e.descrizione.replace(/\s+/g, " ")} (${dove}) · ${stato}`;
+  });
+  if (visibili.length > MAX_CONDIVISI) righe.push(`…e altri ${visibili.length - MAX_CONDIVISI}`);
+  return [`Bacheca eventi BuonaCaccia: ${parti.join(" · ")}`, ...righe].join("\n");
+}
+
+async function condividi() {
+  const url = location.href;
+  const text = testoCondivisione();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Bacheca eventi", text, url });
+    } catch (err) {
+      if (err.name !== "AbortError") copia(`${text}\n\n${url}`);
+    }
+    return;
+  }
+  copia(`${text}\n\n${url}`);
+}
+
+async function copia(testo) {
+  const etichetta = el.condividi.lastElementChild;
+  try {
+    await navigator.clipboard.writeText(testo);
+    etichetta.textContent = "Copiato!";
+  } catch {
+    etichetta.textContent = "Copia non riuscita";
+  }
+  setTimeout(() => { etichetta.textContent = "Condividi"; }, 2000);
+}
+
 /* ---------- render: lista ---------- */
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
@@ -567,6 +623,7 @@ function collega() {
   el.daAprire.addEventListener("change", () => aggiorna({ daAprire: el.daAprire.checked }));
   el.azzera.addEventListener("click", () => aggiorna({ ...DEFAULT }));
   el.appunta.addEventListener("click", apriFormAppunta);
+  el.condividi.addEventListener("click", condividi);
   el.annulla.addEventListener("click", () => { el.formAppunta.hidden = true; });
   el.chipTipo.addEventListener("click", () => {
     const open = el.chipTipo.getAttribute("aria-expanded") !== "true";

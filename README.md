@@ -30,6 +30,9 @@ la lettura di `eventi.json`.
 
 Nella pagina:
 - i filtri si applicano subito e finiscono nell'indirizzo, quindi il link si può condividere;
+- **Condividi** (in alto, utile soprattutto nell'app installata, che non ha la barra dell'indirizzo) apre la
+  condivisione del telefono con il link della selezione e un messaggio che la riassume con i primi eventi;
+  dove la condivisione non c'è, copia messaggio e link negli appunti;
 - **+ Appunta filtro** salva il filtro corrente come preferito (nel browser, `localStorage`); un tocco sul
   biglietto lo riapplica, **Modifica** permette di rinominarlo o eliminarlo;
 - l'ultimo filtro usato viene ripristinato alla visita successiva;
@@ -43,6 +46,11 @@ La mappa (`site/italia-regioni.svg`) è generata da `tools/genera_mappa.py` dai 
 La pagina si può installare come app (*Aggiungi a Home* su iPhone, *Installa app* su Android, Chrome ed
 Edge): nome e icona vengono da `site/manifest.webmanifest` e `site/icons/`. Le icone ridisegnano
 `site/favicon.svg`; se cambia, rigenerale con `uv run --with pillow python tools/genera_icone.py`.
+
+Lo stesso script disegna `site/og-image.png`, l'anteprima mostrata da WhatsApp, Telegram e social quando si
+condivide un link. È la stessa per ogni selezione (il sito è statico e WhatsApp non esegue il JavaScript):
+il dettaglio della selezione sta nel testo del messaggio. I tag `og:` in `site/index.html` usano l'indirizzo
+assoluto `https://mdm13.github.io/bacheca-buonacaccia/`: se il sito cambia indirizzo vanno aggiornati.
 
 ## Pubblicazione su GitHub Pages
 

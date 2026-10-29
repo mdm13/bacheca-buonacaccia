@@ -94,9 +94,16 @@ a { color: inherit; text-underline-offset: .2em; text-decoration-thickness: 1px;
   color: var(--on-cork);
   padding: 14px 16px 16px;
 }
-.shell-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; max-width: 1240px; margin: 0 auto; }
+.shell-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; max-width: 1240px; margin: 0 auto; }
 .shell h1 { margin: 0; font-family: var(--font-date); font-weight: 700; font-size: 1.6rem; letter-spacing: .01em; line-height: 1.1; }
 .updated { margin: 0; font-size: .8rem; color: var(--on-cork-soft); text-align: right; }
+.shell-tools { display: flex; align-items: center; gap: 10px; }
+.btn-share {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px;
+  font: 600 .9rem var(--font); color: var(--on-cork); background: transparent; cursor: pointer;
+  border: 1.5px solid var(--on-cork-soft); border-radius: var(--radius); white-space: nowrap;
+}
+.btn-share:hover { background: rgb(255 255 255 / .1); }
 
 .pins, .search { max-width: 1240px; margin-left: auto; margin-right: auto; }
 .pins { margin-top: 14px; }
