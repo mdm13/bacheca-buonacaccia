@@ -462,12 +462,9 @@ function apriFormAppunta() {
 
 /* ---------- condivisione ---------- */
 // WhatsApp e simili mostrano per ogni link la stessa anteprima (meta og: in index.html):
-// la selezione viaggia nel testo del messaggio, con i primi eventi in elenco.
-const MAX_CONDIVISI = 5;
-
+// il messaggio descrive in breve i filtri scelti, gli eventi si vedono aprendo il link.
 function testoCondivisione() {
-  const visibili = ordina(filtra(eventi, filtri), filtri.o);
-  const parti = [contaEventi(visibili.length)];
+  const parti = [];
   if (filtri.t) parti.push(filtri.t);
   else if (!tutte(filtri.c, TUTTE_BRANCHE)) parti.push(filtri.c.join(", "));
   // Nel messaggio le regioni scelte si leggono per esteso, se poche
@@ -476,18 +473,7 @@ function testoCondivisione() {
   if (filtri.q.trim()) parti.push(`“${filtri.q.trim()}”`);
   if (filtri.daAprire) parti.push("iscrizioni da aprire");
   else if (!filtri.pieni) parti.push("con posti liberi");
-
-  const righe = visibili.slice(0, MAX_CONDIVISI).map((e) => {
-    const dove = [e.regione, e.localita].filter(Boolean).join(", ");
-    let stato;
-    if (e.pieno) stato = "PIENO";
-    else if (e.daAprire) stato = `iscrizioni dal ${fmtBreve.format(e.apertura)}`;
-    else if (e.chiusura && e.chiusura >= oggi) stato = `iscrizioni fino al ${fmtBreve.format(e.chiusura)}`;
-    else stato = "iscrizioni aperte";
-    return `• ${intervallo(e.inizio, e.fine) || "data da definire"} – ${e.descrizione.replace(/\s+/g, " ")} (${dove}) · ${stato}`;
-  });
-  if (visibili.length > MAX_CONDIVISI) righe.push(`…e altri ${visibili.length - MAX_CONDIVISI}`);
-  return [`Bacheca eventi BuonaCaccia: ${parti.join(" · ")}`, ...righe].join("\n");
+  return `Bacheca eventi BuonaCaccia: ${parti.join(" · ")}`;
 }
 
 async function condividi() {

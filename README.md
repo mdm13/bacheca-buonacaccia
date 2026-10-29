@@ -31,7 +31,7 @@ la lettura di `eventi.json`.
 Nella pagina:
 - i filtri si applicano subito e finiscono nell'indirizzo, quindi il link si può condividere;
 - **Condividi** (in alto, utile soprattutto nell'app installata, che non ha la barra dell'indirizzo) apre la
-  condivisione del telefono con il link della selezione e un messaggio che la riassume con i primi eventi;
+  condivisione del telefono con il link della selezione e un breve messaggio che descrive i filtri scelti;
   dove la condivisione non c'è, copia messaggio e link negli appunti;
 - **+ Appunta filtro** salva il filtro corrente come preferito (nel browser, `localStorage`); un tocco sul
   biglietto lo riapplica, **Modifica** permette di rinominarlo o eliminarlo;
